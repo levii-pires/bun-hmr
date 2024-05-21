@@ -1,5 +1,4 @@
-import WebSocket from "ws";
-import type http from "http";
+import { Serve, Server } from "bun";
 
 interface Dependency {
   dependents: Set<string>;
@@ -9,28 +8,37 @@ interface Dependency {
   needsReplacement: boolean;
 }
 
-export class EsmHmrEngine {
+export class BunHmrEngine<T = unknown> {
   clients: Set<WebSocket> = new Set();
   dependencyTree = new Map<string, Dependency>();
+  server: Server;
 
-  constructor(options: { server?: http.Server } = {}) {
-    const wss = options.server
-      ? new WebSocket.Server({ noServer: true })
-      : new WebSocket.Server({ port: 12321 });
-    if (options.server) {
-      options.server.on("upgrade", (req, socket, head) => {
-        // Only handle upgrades to ESM-HMR requests, ignore others.
-        if (req.headers["sec-websocket-protocol"] !== "esm-hmr") {
-          return;
-        }
-        wss.handleUpgrade(req, socket, head, (client) => {
-          wss.emit("connection", client, req);
+  constructor(serve: Serve<T> & { hmrEndpoint: string }) {
+    this.server = Bun.serve({
+      ...serve,
+      websocket: {
+        message(ws, message) {},
+
+        open: (ws) => {
+          this.registerListener(ws);
+        },
+      },
+      fetch(request) {
+        const { pathname } = new URL(request.url);
+        if (
+          pathname != serve.hmrEndpoint ||
+          request.headers.get("sec-websocket-protocol") !== "esm-hmr"
+        )
+          return serve.fetch.call(this, request, this) as Response;
+
+        const upgraded = this.upgrade(request, {
+          headers: { "sec-websocket-protocol": "esm-hmr" },
         });
-      });
-    }
-    wss.on("connection", (client) => {
-      this.connectClient(client);
-      this.registerListener(client);
+
+        if (!upgraded) return new Response("Upgrade failed", { status: 400 });
+
+        return new Response(null, { status: 204 });
+      },
     });
   }
 

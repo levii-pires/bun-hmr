@@ -14,7 +14,7 @@ function debug(...args: any[]) {
   console.log("[ESM-HMR]", ...args);
 }
 function reload() {
-  location.reload(true);
+  location.reload();
 }
 
 let SOCKET_MESSAGE_QUEUE: any[] = [];

@@ -1,28 +1,21 @@
 {
-  "name": "esm-hmr",
+  "name": "bun-hmr",
   "version": "0.1.0",
-  "description": "a Hot Module Replacement (HMR) API for your ESM-based dev server.",
+  "description": "a Hot Module Replacement (HMR) API for Bun. Fork of esm-hmr",
   "license": "MIT",
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch",
-    "format": "prettier --write 'src/**/*.ts'"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pikapkg/esm-hmr.git"
+    "url": "git+https://github.com/levii-pires/bun-hmr.git"
   },
   "bugs": {
-    "url": "https://github.com/pikapkg/esm-hmr/issues"
+    "url": "https://github.com/levii-pires/bun-hmr/issues"
   },
-  "homepage": "https://github.com/pikapkg/esm-hmr#readme",
+  "homepage": "https://github.com/levii-pires/bun-hmr#readme",
   "dependencies": {
-    "@types/ws": "^7.2.4",
-    "ws": "^7.3.0"
+    "@types/bun": "^1.1.2"
   },
   "devDependencies": {
-    "@types/node": "^14.0.4",
-    "prettier": "^2.0.5",
-    "typescript": "^3.9.3"
+    "typescript": "^5.4.5"
   }
 }
